@@ -10,12 +10,12 @@
 # class/sampledb/simpledb_mysql.sql
 
 from mysql.connector import connect
-import dbconfig
 
-con = connect(user=dbconfig.DB_USER, password=dbconfig.DB_PASS, database=dbconfig.DB_NAME, host=dbconfig.DB_HOST)
+con = connect(user='root', password='passw0rd', database='simpledb', host='localhost')
+
 cursor = con.cursor()
 
-# Automatically commit INSERT/DELETE/UPDATE
+# Make INSERT/DELETE/UPDATE take effect immediately without a separate commit command
 con.autocommit = True
 
 # Execute an INSERT/DELETE/UPDATE statement
@@ -26,59 +26,14 @@ cursor.execute("""
 """)
 print("Updated {} rows.".format(cursor.rowcount))
 
-desc = "O'Rourke"
-qty = 3
 cursor.execute("""
-    update Product 
-    set Quantity = Quantity + %s
-    where ProdName = %s
-""", (qty, desc))
-print("Updated {} rows.".format(cursor.rowcount))
-
-# Danger: Sharks lurk here.
-desc = input('Name of product:')
-# desc = desc.replace("'", "''")
-cursor.execute(f"""
-    update Product 
-    set Quantity = Quantity + {qty}
-    where ProdName = '{desc}'
-""")
-print("Updated {} rows.".format(cursor.rowcount))
-
-
-qty = 5
-# Execute a SELECT statement
-# See: https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor-execute.html
-cursor.execute("""
-    select ProdId, ProdName, Quantity, ProdNextShipDate
+    select ProdId, ProdName
     from product
-    where quantity < %s
-    """, (qty,) )
+    """)
 
-# Retrieve results
-result = cursor.fetchall()
-print('result = ', result)
+result = cursor.fetchall()              # Retrieve list of rows from database
 
-print("Products with quantity < {}:\n".format(qty))
+print('\nProduct table:')
 for row in result:
-    (prodId, prodName, quantity, shipDate) = row
-    print("{}: {} ({}) ships {}".format(prodId, prodName, quantity, shipDate))
-
-# Execute a stored procedure that returns an OUT parameter
-result = cursor.callproc('AddNums', (5, 3, 0))
-# Access the value of the OUT parameter (the third parameter)
-print("Got stored procedure result: " + str(result[2]))
-
-# Execute a stored procedure that returns a result set
-result = cursor.callproc('GetProducts')
-
-# Retrieve result set
-result_set = next(cursor.stored_results())
-result = result_set.fetchall()
-# print out the result
-print(result)
-
-cursor.close()
-con.close()
-
-
+    (prodId, prodName) = row      # Extract prodId and prodName from row tuple
+    print(f"{prodId}: {prodName}")
