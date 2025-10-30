@@ -48,7 +48,7 @@ cursor.execute(f"""
     set Quantity = Quantity + {qty}
     where ProdName = '{desc}'
 """)
-print("Updated {} rows.".format(cursor.rowcount))
+print(f"Updated {cursor.rowcount} rows.")
 
 
 qty = 5
@@ -58,7 +58,7 @@ cursor.execute("""
     select ProdId, ProdName, Quantity, ProdNextShipDate
     from product
     where quantity < %s
-    """, (qty,) )
+    """, [qty] )
 
 # Retrieve results
 result = cursor.fetchall()

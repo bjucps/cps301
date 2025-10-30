@@ -12,10 +12,9 @@ def hello():
         name = request.args['name']
     else:
         name = "world"
-    return """<html><body>
-        <h1>Hello, {0}!</h1>
-        The time is {1}.</body></html>""".format(
-            name, str(datetime.now()))
+    return f"""<html><body>
+        <h1>Hello, {name}!</h1>
+        The time is {datetime.now()}.</body></html>"""
 
 # Launch the local web server
 if __name__ == "__main__":
