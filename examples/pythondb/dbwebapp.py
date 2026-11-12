@@ -5,8 +5,6 @@
 
 
 from flask import Flask, request
-from datetime import datetime
-import time
 from mysql.connector import connect
 import dbconfig
 
@@ -14,7 +12,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    qty = 0
     qty = request.args.get('qty')
 
     # We don't close the following explicitly because they are automatically closed
@@ -23,11 +20,14 @@ def hello():
     cursor = con.cursor() 
     con.autocommit = True
 
+    if qty is None:
+        return HTML_DOC.format("")
+
     cursor.execute("""
         select ProdId, ProdName, Quantity, ProdNextShipDate
         from product
         where Quantity < %s
-    """, (qty, ))
+    """, [qty])
 
     # SQL Injection vulnerability here:
     # cursor.execute(f"""
